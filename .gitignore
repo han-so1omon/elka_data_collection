@@ -1,2 +1,4 @@
 *.sw*
 *.pyc
+build_elka_data_collection/
+build_elka_data_collection/*

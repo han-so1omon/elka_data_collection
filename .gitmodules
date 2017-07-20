@@ -1,8 +1,15 @@
 [submodule "elka_comm"]
-	path = elka_comm
-	url = https://github.com/han-so1omon/elka_comm.git
-	branch = master
+	path = src/elka_comm
+  url = https://github.com/han-so1omon/elka_comm.git
+  branch = master
 [submodule "pybind11"]
-	path = pybind11
+	path = src/pybind11
 	url = https://github.com/pybind/pybind11.git
 	branch = master
+
+[submodule "tools/genmsg"]
+	path = tools/genmsg
+	url = https://github.com/ros/genmsg.git
+[submodule "tools/gencpp"]
+	path = tools/gencpp
+	url = https://github.com/ros/gencpp.git
