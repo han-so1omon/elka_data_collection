@@ -1,24 +1,22 @@
 from PyQt4 import QtGui, QtCore
 from collections import deque
+from time import sleep
 import pyqtgraph as pg
 import numpy as np
 
 import ftdi_uart as ftdi
 import parse
+import test_qthread
 
 # Define a top-level widget to hold everything
 class MainWindow(QtGui.QWidget):
     def __init__(self):
         super(MainWindow, self).__init__()
         # Create some widgets to be placed inside
-        self.plt_btn = QtGui.QPushButton('Plot data')
-        self.elka_start_btn = QtGui.QPushButton('Start ELKA')
-        self.elka_stop_btn = QtGui.QPushButton('Stop ELKA')
-        #self.plt_btn.clicked.connect()
-        #self.text = QtGui.QLineEdit('Name of data set')
         self.listw = QtGui.QListWidget()
-        #self.plot = pg.PlotWidget()
-        self.plotw = pg.GraphicsLayoutWidget()
+        #self.plotw = pg.GraphicsLayoutWidget()
+        self.te = QtGui.QTextEdit()
+        self.cursor = self.te.textCursor()
 
         #TODO add menubar
         '''
@@ -39,20 +37,27 @@ class MainWindow(QtGui.QWidget):
         layout = QtGui.QGridLayout()
         self.setLayout(layout)
 
-        # Add widgets to the layout in their proper positions
-        layout.addWidget(self.plt_btn, 1, 0) # Button goes in upper left
         # Start ELKA
         # For now, just start ELKA serial
         # TODO start ELKA and specify connection
-        layout.addWidget(self.elka_start_btn, 2, 0)
-        layout.addWidget(self.elka_stop_btn, 3, 0)
-        #layout.addWidget(self.text, 2, 0) # Text edit goes in middle left
         layout.addWidget(self.listw, 4, 0) # List widget goes in bottom left
-        layout.addWidget(self.plotw, 1, 1, 4, 1) # Plot goes on right side, spanning 3 rows
+        layout.addWidget(self.te, 1, 1, 4, 1)
+        #layout.addWidget(self.plotw, 1, 1, 4, 1) # Plot goes on right side, spanning 3 rows
 
         self.threads = {}
 
-        q = deque()
+        self.q = deque()
+        
+        ''' Play with QThread '''
+        self.threads['test'] = test_qthread.TestThread(self,
+                                                       self.q)
+        self.threads['test'].update.connect(self.update_text)
+
+        self.threads['test'].finished.connect(self.close)
+
+        self.threads['test'].start()
+
+        '''
         self.threads["elka"] = ftdi.FtdiUartThread(q=q)
         self.threads["parse"] = parse.Parse(q=q)
 
@@ -85,21 +90,16 @@ class MainWindow(QtGui.QWidget):
 
         # Enable live plotting
         self.make_plot_dynamic('test')
+        '''
        
-    def start_elka_thread(self):
-        self.threads["elka"].exiting=False
-        self.threads["elka"].start()
+    def update_text(self):
+        try:
+            self.cursor.movePosition(self.cursor.End)
+            self.cursor.insertText(self.q.pop())
+        except IndexError:
+            sleep(0.1)
 
-    def stop_elka_thread(self):
-        self.threads["elka"].exiting = True
-
-    def start_parse_thread(self):
-        self.threads["parse"].exiting=False
-        self.threads["parse"].start()
-
-    def stop_parse_thread(self):
-        self.threads["parse"].exiting = True
-
+    '''
     def add_plot(self, name):
         self.plots[name] = PlotData(self.plotw.addPlot(title=name))
 
@@ -115,6 +115,7 @@ class MainWindow(QtGui.QWidget):
     def update_all(self):
         for key in self.plots:
             self.plots[key].update_all()
+    '''
 
 
 
