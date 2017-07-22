@@ -100,3 +100,9 @@ elka_generate_messages(TARGET msg_gen
 #=============================================================================
 
 add_subdirectory(src)
+
+#TODO set PYTHONPATH
+set(PYTHON_MODULES
+	${ELKA_BINARY_DIR}/src/elka_comm/common
+	${ELKA_BINARY_DIR}/src/elka_comm/gnd_station
+)
