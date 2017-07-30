@@ -6,7 +6,10 @@ import numpy as np
 
 import ftdi_uart as ftdi
 import parse
-import test_qthread
+#import test_qthread
+import elka_comm_thread
+import elka_ground_port as egp
+import elka
 
 # Define a top-level widget to hold everything
 class MainWindow(QtGui.QWidget):
@@ -47,15 +50,33 @@ class MainWindow(QtGui.QWidget):
         self.threads = {}
 
         self.q = deque()
-        
+
+        egp.ElkaGroundPort.initialize(
+                port_num=0,
+                port_type=elka.PORT_NONE,
+                buf_type=elka.PRIORITY_QUEUE,
+                queue_sz=42,
+                dev_name="ground_station")
+
         ''' Play with QThread '''
-        self.threads['test'] = test_qthread.TestThread(self,
-                                                       self.q)
-        self.threads['test'].update.connect(self.update_text)
+        self.threads['publish'] = elka_comm_thread.ElkaCommPublishThread(
+                                    self,
+                                    self.q)
+        self.threads['publish'].update.connect(self.update_text)
 
-        self.threads['test'].finished.connect(self.close)
+        self.threads['publish'].finished.connect(self.close)
 
-        self.threads['test'].start()
+        self.threads['publish'].start()
+
+        self.threads['parse'] = elka_comm_thread.ElkaCommParseThread(
+                                    self,
+                                    self.q)
+        self.threads['parse'].update.connect(self.update_text)
+
+        self.threads['parse'].finished.connect(self.close)
+
+        self.threads['parse'].start()
+
 
         '''
         self.threads["elka"] = ftdi.FtdiUartThread(q=q)

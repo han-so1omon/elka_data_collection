@@ -24,6 +24,19 @@ set(PYBIND11_CPP_STANDARD -std=c++11)
 # must come before project to set toolchain
 set(OS "ubuntu")
 
+set(Boost_USE_MULTITHREADED ON)
+
+find_package(Boost
+  COMPONENTS system thread
+  REQUIRED
+)
+
+if (Boost_FOUND)
+	include_directories(${BOOST_INCLUDE_DIRS})
+else()
+	message(FATAL_ERROR "Cannot find C++ Boost" )
+endif()
+
 # Define GNU standard installation directories
 include(GNUInstallDirs)
 
@@ -63,6 +76,13 @@ include_directories(
   ${ELKA_SOURCE_DIR}/src/elka_comm
 )
 
+link_directories(
+  ${ELKA_BINARY_DIR}/src/elka_comm/common
+  ${ELKA_BINARY_DIR}/src/elka_comm/gnd_station
+  ${ELKA_BINARY_DIR}/python
+  ${ELKA_SOURCE_DIR}/python
+)
+
 set(ELKA_LINK_LIBS "")
 
 add_definitions(
@@ -98,6 +118,16 @@ elka_generate_messages(TARGET msg_gen
 )
 
 #=============================================================================
+# Set C/C++ compile and linking flags
+set(GCC_COVERAGE_COMPILE_FLAGS "-fpic -Wl,--no-as-needed")
+
+set(GXX_COVERAGE_COMPILE_FLAGS "-std=c++11")
+
+set(GXX_COVERAGE_LINK_FLAGS "-Wl,--no-undefined -Wl,--no-as-needed")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS} ${GXX_COVERAGE_COMPILE_FLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER__FLAGS} ${GCC_COVERAGE_LINK_FLAGS}")
 
 add_subdirectory(src)
 

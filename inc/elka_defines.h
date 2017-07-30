@@ -1,7 +1,15 @@
 #ifndef ELKA_DEFINES_H
 #define ELKA_DEFINES_H
 
+#define SERIAL_SIZE_OF_DATA_BUFFER 128
+#define SERIAL_WRITE_DELAY_USEC (8000 * 10)
+
+#define MAX_UART_DEV_NUM 6
+// MAX_MSG_LEN + elka_msg_s::MSG_OFFSET
+#define MAX_ELKA_MSG_LEN 267 
+
 #define ELKA_OK 0
 #define ELKA_ERROR -1
+
 
 #endif

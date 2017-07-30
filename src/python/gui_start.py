@@ -12,7 +12,6 @@ if __name__ == "__main__":
     window = MainWindow()
     window.resize(1000,600)
     window.setWindowTitle('Elka Control')
-
     window.show()
     sys.exit(app.exec_())
 
